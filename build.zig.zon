@@ -1,5 +1,5 @@
 .{
-    .name = "regz",
+    .name = "tools/regz",
     .version = "0.0.0",
     .paths = .{
         "LICENSE",
@@ -12,13 +12,9 @@
     },
     .dependencies = .{
         .libxml2 = .{
-            .url = "https://github.com/mitchellh/zig-build-libxml2/archive/4e80a167d6e13e09e0da77457310401084e758cc.tar.gz",
-            .hash = "1220000fd2a0f192b1aab0c12be0080748e774044399d69a852ffa38a58f2b1dcc09",
-        },
-        .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/f49b94700e0761b7514abdca0e4f0e7f3f938a93.tar.gz",
-            .hash = "1220f48518ce22882e102255ed3bcdb7aeeb4891f50b2cdd3bd74b5b2e24d3149ba2",
+            .url = "https://github.com/mattnite/zig-build-libxml2/archive/fca6bbd7f73914acaea685c544d91608797546a8.tar.gz",
+            .hash = "1220c3e12fc08c12d6fc52bcc0ae8b180a69abc08212350e2708d4851879f4c814da",
         },
     },
-    .paths = .{""},
+    .minimum_zig_version = "0.12.0",
 }

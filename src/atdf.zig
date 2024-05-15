@@ -84,6 +84,10 @@ fn load_device(ctx: *Context, node: xml.Node) !void {
     if (node.find_child(&.{"interrupts"})) |interrupts_node|
         try load_interrupts(ctx, interrupts_node, id);
 
+    var param_it = node.iterate(&.{"parameters"}, &.{"param"});
+    while (param_it.next()) |param_node|
+        try load_param(ctx, param_node, id);
+
     try infer_peripheral_offsets(ctx);
     try infer_enum_sizes(ctx);
 
@@ -98,9 +102,24 @@ fn load_device(ctx: *Context, node: xml.Node) !void {
     // events.generators.generator
     // events.users.user
     // interfaces.interface.parameters.param
-    // parameters.param
 
     // property-groups.property-group.property
+}
+
+fn load_param(ctx: *Context, node: xml.Node, device_id: EntityId) !void {
+    const db = ctx.db;
+    assert(db.entity_is("instance.device", device_id));
+    validate_attrs(node, &.{
+        "name",
+        "value",
+    });
+
+    const name = node.get_attribute("name") orelse return error.MissingParamName;
+    const value = node.get_attribute("value") orelse return error.MissingParamName;
+    // TODO: do something with caption
+    _ = node.get_attribute("caption");
+
+    try db.add_device_property(device_id, name, value);
 }
 
 fn load_interrupts(ctx: *Context, node: xml.Node, device_id: EntityId) !void {
@@ -1145,7 +1164,7 @@ test "atdf.register with bitfields and enum" {
         \\  </modules>
         \\</avr-tools-device-file>
     ;
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
@@ -1271,7 +1290,7 @@ test "atdf.register with mode" {
         \\
     ;
 
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
@@ -1394,7 +1413,7 @@ test "atdf.instance of register group" {
         \\
     ;
 
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
@@ -1433,7 +1452,7 @@ test "atdf.interrupts" {
         \\
     ;
 
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
@@ -1459,7 +1478,7 @@ test "atdf.interrupts with module-instance" {
         \\
     ;
 
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
@@ -1492,7 +1511,7 @@ test "atdf.interrupts with interrupt-groups" {
         \\
     ;
 
-    var doc = try xml.Doc.from_memory(text);
+    const doc = try xml.Doc.from_memory(text);
     var db = try Database.init_from_atdf(std.testing.allocator, doc);
     defer db.deinit();
 
